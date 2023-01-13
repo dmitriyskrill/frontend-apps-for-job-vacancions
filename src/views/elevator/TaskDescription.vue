@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import description from '@/assets/testExercise.json'
-</script>
-
 <template>
   <h1>Вы на главной странице приложения «Эмулятор лифта»</h1>
   <p>Данное приложение является тестовым заданием</p>
@@ -40,6 +36,20 @@ import description from '@/assets/testExercise.json'
 
   </v-img>
 </template>
+
+<script lang="ts">
+import description from '@/assets/testExercise.json'
+
+export default {
+  name: 'ElevatorTaskDescription',
+  computed: {
+    description () {
+      return description
+    }
+  }
+}
+
+</script>
 
 <style scoped>
 .white-space-pre-wrap {

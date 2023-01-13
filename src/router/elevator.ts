@@ -12,7 +12,7 @@ const routes = [
   {
     path: '/elevator/emulator',
     name: 'elevatorEmulator',
-    component: () => import('@/views/elevator/Emulator.vue'),
+    component: () => import('@/views/elevator/SimplifiedEmulator.vue'),
     meta: {
       layout: Main
     }

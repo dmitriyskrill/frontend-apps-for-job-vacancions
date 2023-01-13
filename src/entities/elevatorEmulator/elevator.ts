@@ -1,24 +1,15 @@
+import {elevatorStatuses, moveDirections} from './emuns'
 
-enum elevatorStatuses {  // Статусы лифта
-  RELAX = 'relax',
-  FREE = 'free',
-  MOVING = 'moving'
-}
-
-enum moveDirections {  // Статусы лифта
-  UP = 'up',
-  DOWN = 'down',
-}
-
-interface IElevatorInitProps {
+export interface IElevatorInitProps {
   relaxTime?: number | undefined,
   travelTimePerFloor?: number | undefined
   floor?: number | undefined
   status?: string | undefined
 }
 
-class Elevator {
+export class Elevator {
 
+  id: number
   currentFloor: number
   currentStatus: string
   moveTimePerFloor: number
@@ -33,6 +24,7 @@ class Elevator {
     this.relaxTime = relaxTime || 3000
     this.currentStatus = status || elevatorStatuses.FREE
     this.currentFloor = floor || 1
+    this.id = Date.now()
   }
 
   get difference () {
@@ -100,25 +92,25 @@ class Elevator {
     })
   }
 
-  async endRelaxing(){
+  async endMoving () {
+    this.currentStatus = elevatorStatuses.RELAX
+    this.moveDirection = null
+    this.goalFloor = null
+    this.callStack.splice(0, 1)
+    await this.endRelaxing()
+  }
+
+  async endRelaxing () {
     return await new Promise((resolve) => {
       setTimeout(() => {
         if (this.callStack.length > 0) {
           this.setGoalFloor(this.callStack[0])
         } else {
           this.currentStatus = elevatorStatuses.FREE
+
         }
         resolve('')
       }, this.relaxTime)
     })
   }
-  async endMoving () {
-    this.currentStatus = elevatorStatuses.RELAX
-    this.moveDirection = null
-    this.callStack.splice(0, 1)
-    await this.endRelaxing()
-  }
-
 }
-
-export default Elevator
