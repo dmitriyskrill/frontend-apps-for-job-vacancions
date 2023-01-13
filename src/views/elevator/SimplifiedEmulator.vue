@@ -6,7 +6,7 @@
         style="width: 100%; height: 10%; background: #234908"
     >
       <v-btn @click="restartElevator">restartElevator</v-btn>
-      <v-text-field v-model.number="goalFloor" type="number" label="goalFloor"></v-text-field>
+      {{ callStack }}
     </v-row>
     <v-row
         no-gutters
@@ -17,7 +17,7 @@
             class="d-flex"
             id="elevator"
             ref="elevator"
-            :style="`width:100%; height:${100/floorsCount}%; background: #535bf2; position: absolute;`"
+            :style="`width:100%; height:${100/floorsCount}%; background: #535bf2; position: absolute; bottom: 0`"
         >
           <v-chip class="ma-auto">
             <template v-if="elevator.currentStatus === 'moving'">
@@ -40,7 +40,12 @@
             class="d-flex"
             :style="`height: ${100/floorsCount}%`"
         >
-          <v-btn class="ma-auto" @click="addFloorToCallStack(floor)">{{ floor }}</v-btn>
+          <v-btn
+              :color="callStack.includes(floor) ? 'success' : ''"
+              class="ma-auto"
+              @click="addFloorToCallStack(floor)"
+          >{{ floor }}
+          </v-btn>
         </div>
 
       </div>
@@ -57,12 +62,15 @@ export default {
   data: () => ({
     floorsCount: 5,
     elevator: null,
-    goalFloor: 5,
   }),
   computed: {
-    currentFloor () {
+    callStack(){
+      if (!this.elevator) return []
+      return this.elevator.callStack
+    },
+    goalFloor () {
       if (!this.elevator) return null
-      return this.elevator.currentFloor
+      return this.elevator.goalFloor
     },
     floors () {
       const array = []
@@ -73,7 +81,7 @@ export default {
     },
   },
   watch: {
-    currentFloor (value) {
+    goalFloor (value) {
       this.setBottomToElevatorNode(value)
     },
   },
@@ -82,12 +90,15 @@ export default {
       this.setBottomToElevatorNode()
     },
     async setBottomToElevatorNode (value) {
-      await this.$nextTick()
+      if (value === null) return
       const elevatorNode = this.$refs['elevator']
-      console.log(elevatorNode)
+      console.log('setBottomToElevatorNode', 1, this.elevator.currentFloor, this.elevator.goalFloor)
       if (!elevatorNode) return
+      console.log('setBottomToElevatorNode', 2, this.elevator.currentFloor, this.elevator.goalFloor)
       const elevatorNodeHeight = elevatorNode.offsetHeight
+      elevatorNode.style.transitionDuration = (this.elevator.lastDifference * this.elevator.moveTimePerFloor) + 'ms'
       elevatorNode.style.bottom = (value - 1) * elevatorNodeHeight + 'px'
+
     },
     restartElevator () {
       this.elevator = new Elevator({
@@ -112,9 +123,8 @@ export default {
 </script>
 
 <style>
- #elevator {
-   transition-duration: 1s;
-   transition-property: bottom;
-   transition-delay: 0.1s;
- }
+#elevator {
+  transition-property: bottom;
+  transition-timing-function: linear;
+}
 </style>

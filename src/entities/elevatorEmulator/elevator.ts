@@ -1,4 +1,4 @@
-import {elevatorStatuses, moveDirections} from './emuns'
+import { elevatorStatuses, moveDirections } from './emuns'
 
 export interface IElevatorInitProps {
   relaxTime?: number | undefined,
@@ -12,6 +12,7 @@ export class Elevator {
   id: number
   currentFloor: number
   currentStatus: string
+  lastDifference: number | null = null
   moveTimePerFloor: number
   relaxTime: number
   moveDirection: string | null = null
@@ -64,6 +65,7 @@ export class Elevator {
 
   async move () {
     console.log('move', this.difference, this.currentFloor, this.goalFloor, this.moveDirection, this.currentStatus)
+    this.lastDifference = Math.abs(this.difference)
     if (this.difference > 0) {
       await this.moveUp()
     } else {
