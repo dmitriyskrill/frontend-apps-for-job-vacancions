@@ -1,80 +1,55 @@
 <template>
-  <div v-if="!elevator">Идет загрузка</div>
+  <div class="d-flex align-center justify-center" v-if="!elevator">Идет загрузка</div>
   <div v-else style="height:calc(100vh - 48px); width: 100%">
-    <v-row
-        class="align-center px-2"
-        no-gutters
-        style="width: 100%; height: 10%; background: #234908"
-    >
-      <v-col>
-        Текущий этаж: {{ elevator.currentFloor }}
-      </v-col>
-      <v-col>
-        Скорость: 1 этаж за {{ elevator.moveTimePerFloor / 1000 }} секунд
-      </v-col>
-      <v-col>
-        Время отдыха: 1 этаж за {{ elevator.relaxTime / 1000 }} секунд(ы)
-      </v-col>
-      <v-col>
-        Очередь вызовов: {{ elevator.callStack }}
-      </v-col>
-    </v-row>
+    <elevator-emulation-simplified-emulator-header
+        :call-stack="callStack"
+        :current-floor="currentFloor"
+        :move-time-per-floor="moveTimePerFloor"
+        :relax-time="relaxTime"
+    />
     <v-row
         no-gutters
         style="width: 100%; height: 90%; background: #b3b7ec"
     >
-      <div style="width: 80%; position: relative">
-        <div
-            class="d-flex"
-            id="elevator"
-            ref="elevator"
-            :style="`width:100%; height:${100/floorsCount}%; background: #535bf2; position: absolute; bottom: 0`"
-            :class="currentStatus === 'relax' ? 'animated-elevator' : ''"
-        >
-          <v-chip class="ma-auto">
-            <template v-if="elevator.currentStatus === 'moving'">
-              {{ elevator.goalFloor }}
-              <v-icon size="small">mdi-arrow-{{ elevator.moveDirection }}</v-icon>
-            </template>
-            <template v-else-if="elevator.currentStatus === 'relax'">
-              <v-icon> mdi-sleep</v-icon>
-            </template>
-            <template v-else>
-              <v-icon> mdi-check</v-icon>
-            </template>
-          </v-chip>
-        </div>
+      <div style="width: 80%;height: 100%">
+        <elevator-emulation-lift-shaft
+            :current-status="currentStatus"
+            :goal-floor="goalFloor"
+            :floors-count="floorsCount"
+            :move-direction="moveDirection"
+        />
       </div>
-      <div style="width: 20%; background: #213547; ">
-        <div
-            v-for="floor in floors"
-            :key="floor"
-            class="d-flex"
-            :style="`height: ${100/floorsCount}%`"
-        >
-          <v-btn
-              :color="callStack.includes(floor) ? 'success' : ''"
-              class="ma-auto"
-              @click="addFloorToCallStack(floor)"
-          >{{ floor }}
-          </v-btn>
-        </div>
 
-      </div>
+      <elevator-emulation-button-block
+          :floors="floors"
+          :floors-count="floorsCount"
+          :call-stack="callStack"
+          @setFloor="addFloorToCallStack($event)"
+      />
     </v-row>
   </div>
 </template>
 
 <script>
 import { Elevator } from '@/entities/elevatorEmulator/elevator'
+import ElevatorEmulationButtonBlock from '@/components/ElevatorEmulation/ButtonBlock.vue'
+import ElevatorEmulationLiftShaft from '@/components/ElevatorEmulation/LiftShaft.vue'
+import ElevatorEmulationSimplifiedEmulatorHeader from '@/components/ElevatorEmulation/SimplifiedEmulatorHeader.vue'
 
 export default {
   name: 'ElevatorSimplifiedEmulator',
+  components: { ElevatorEmulationSimplifiedEmulatorHeader, ElevatorEmulationLiftShaft, ElevatorEmulationButtonBlock },
   data: () => ({
     floorsCount: 5,
     elevator: null,
   }),
   computed: {
+    relaxTime(){
+      return this.elevator.relaxTime
+    },
+    moveDirection () {
+      return this.elevator.moveDirection
+    },
     moveTimePerFloor () {
       return this.elevator.moveTimePerFloor
     },
