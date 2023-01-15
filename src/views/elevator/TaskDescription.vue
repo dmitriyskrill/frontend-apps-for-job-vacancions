@@ -1,12 +1,18 @@
 <template>
   <h1>Вы на главной странице приложения «Эмулятор лифта»</h1>
-  <p>Данное приложение является тестовым заданием</p>
+  <p>Данное приложение является тестовым заданием для одной из вакансий</p>
   <v-col class="my-2">
-    <v-row no-gutters>
-      <router-link to="elevator/settings">Перейти к первоначальным настройкам эмулятора лифта</router-link>
+    <v-row no-gutters class="align-center my-2">
+      Перейти к первоначальным настройкам эмулятора лифта
+      <v-btn class="ml-6" @click="goToSettings"> перейти</v-btn>
     </v-row>
-    <v-row no-gutters>
-      <router-link to="/elevator/emulator">Запустить приложение со стандартными настройками</router-link>
+    <v-row no-gutters class="align-center my-2">
+      Запустить приложение со стандартными настройками
+      <v-btn class="ml-6" @click="startWithoutCache">начать</v-btn>
+    </v-row>
+    <v-row no-gutters class="align-center my-2">
+      Запустить приложение с последнего сохранения
+      <v-btn class="ml-6" @click="startWithCache">начать</v-btn>
     </v-row>
   </v-col>
 
@@ -37,7 +43,7 @@
   </v-img>
 </template>
 
-<script lang="ts">
+<script>
 import description from '@/assets/testExercise.json'
 
 export default {
@@ -45,8 +51,20 @@ export default {
   computed: {
     description () {
       return description
-    }
-  }
+    },
+  },
+  methods: {
+    goToSettings () {
+      this.$router.push('elevator/settings')
+    },
+    startWithoutCache () {
+      localStorage.removeItem('singleElevator')
+      this.$router.push('/elevator/emulator')
+    },
+    startWithCache () {
+      this.$router.push('/elevator/emulator')
+    },
+  },
 }
 
 </script>

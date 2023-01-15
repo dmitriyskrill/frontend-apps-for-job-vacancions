@@ -25,6 +25,6 @@ const props = defineProps({
   theme: { type: String, required: true }
 })
 
-const drawer = ref(false)
+const drawer = ref(true)
 
 </script>

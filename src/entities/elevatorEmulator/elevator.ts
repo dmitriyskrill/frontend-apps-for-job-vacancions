@@ -1,55 +1,87 @@
 import { elevatorStatuses, moveDirections } from './emuns'
+import { IElevator, TElevatorInitProps } from './elevator.interfaces'
 
-export interface IElevatorInitProps {
-  relaxTime?: number | undefined,
-  travelTimePerFloor?: number | undefined
-  floor?: number | undefined
-  status?: string | undefined
-}
+export class Elevator implements IElevator {
 
-export class Elevator {
+  private _currentFloor: number
+  private _currentStatus: string
+  private _lastDifference: number | null = null
 
-  id: number
-  currentFloor: number
-  currentStatus: string
-  lastDifference: number | null = null
-  moveTimePerFloor: number
-  relaxTime: number
-  moveDirection: string | null = null
-  goalFloor: number | null = null
-  callStack: number[] = []
+  private _moveDirection: string | null = null
+  private _goalFloor: number | null = null
+  public readonly _callStack: number[]
 
-  constructor (props: IElevatorInitProps) {
-    const { travelTimePerFloor, relaxTime, status, floor } = props
-    this.moveTimePerFloor = travelTimePerFloor || 1000
+  public readonly id: number
+  public readonly moveTimePerFloor: number
+  public readonly relaxTime: number
+
+  get moveDirection (): string | null {
+    return this._moveDirection
+  }
+
+  get goalFloor (): number | null {
+    return this._goalFloor
+  }
+
+  get callStack (): number[] {
+    return this._callStack
+  }
+
+  get lastDifference (): number | null {
+    return this._lastDifference
+  }
+
+  get currentStatus (): string {
+    return this._currentStatus
+  }
+
+  get difference (): number {
+    if (this._goalFloor === null) return 0
+    return this._goalFloor - this._currentFloor
+  }
+
+  get currentFloor (): number {
+    return this._currentFloor
+  }
+
+  constructor (props: TElevatorInitProps) {
+    const { moveTimePerFloor, relaxTime, currentStatus, currentFloor, callStack, id, moveDirection } = props
+    // props
+    this.id = id || Date.now()
     this.relaxTime = relaxTime || 3000
-    this.currentStatus = status || elevatorStatuses.FREE
-    this.currentFloor = floor || 1
-    this.id = Date.now()
+    this.moveTimePerFloor = moveTimePerFloor || 1000
+    // state
+    this._currentFloor = currentFloor || 1
+    this._currentStatus = currentStatus || elevatorStatuses.FREE
+    this._callStack = callStack || []
+    this._moveDirection = moveDirection || null
   }
 
-  get difference () {
-    if (this.goalFloor === null) return 0
-    return this.goalFloor - this.currentFloor
-  }
-
-  addFloorToCallStack (floor: number) {
-    if (floor === this.currentFloor && this.currentStatus === elevatorStatuses.FREE) return
-    const index = this.callStack.indexOf(floor)
+  public addFloorToCallStack (floor: number) {
+    if (floor === this._currentFloor && this._currentStatus === elevatorStatuses.FREE) return
+    const index = this._callStack.indexOf(floor)
     if (index >= 0) return
-    this.callStack.push(floor)
-    if (this.currentStatus === elevatorStatuses.FREE) {
-      this.setGoalFloor(this.callStack[0])
+    this._callStack.push(floor)
+    if (this._currentStatus === elevatorStatuses.FREE) {
+      this.setNextGoalFloor(floor)
     }
   }
 
-  setGoalFloor (floor: number) {
-    console.log('setGoalFloor', floor)
-    this.goalFloor = floor
+  public initFromCache () {
+    if (this._callStack.length === 0) return
+    this.setNextGoalFloor()
+  }
+
+  private setNextGoalFloor (floor?: number | null): void {
+    if (typeof floor === 'number') {
+      this._goalFloor = floor
+    } else {
+      this._goalFloor = this._callStack[0]
+    }
     this.moveToGoalFloor().finally()
   }
 
-  async moveToGoalFloor () {
+  private async moveToGoalFloor () {
     this.startMoving()
     while (this.difference !== 0) {
       await this.move()
@@ -57,62 +89,59 @@ export class Elevator {
     await this.endMoving()
   }
 
-  startMoving () {
-    console.log('startMoving')
-    if (this.callStack.length === 0) return
-    this.currentStatus = elevatorStatuses.MOVING
+  private startMoving () {
+    if (this._callStack.length === 0) return
+    this._currentStatus = elevatorStatuses.MOVING
+    this._lastDifference = Math.abs(this.difference)
   }
 
-  async move () {
-    console.log('move', this.difference, this.currentFloor, this.goalFloor, this.moveDirection, this.currentStatus)
-    this.lastDifference = Math.abs(this.difference)
+  private async move () {
     if (this.difference > 0) {
       await this.moveUp()
     } else {
       await this.moveDown()
     }
-
   }
 
-  async moveUp () {
-    this.moveDirection = moveDirections.UP
+  private async moveUp () {
+    this._moveDirection = moveDirections.UP
     return new Promise((resolve) => {
       setTimeout(() => {
-        this.currentFloor++
+        this._currentFloor++
         resolve('')
       }, this.moveTimePerFloor)
     })
   }
 
-  async moveDown () {
-    this.moveDirection = moveDirections.DOWN
+  private async moveDown () {
+    this._moveDirection = moveDirections.DOWN
     return new Promise((resolve) => {
       setTimeout(() => {
-        this.currentFloor--
+        this._currentFloor--
         resolve('')
       }, this.moveTimePerFloor)
     })
   }
 
-  async endMoving () {
-    this.currentStatus = elevatorStatuses.RELAX
-    this.moveDirection = null
-    this.goalFloor = null
-    this.callStack.splice(0, 1)
+  private async endMoving () {
+    this._currentStatus = elevatorStatuses.RELAX
+    this._moveDirection = null
+    this._goalFloor = null
+    this._callStack.splice(0, 1)
     await this.endRelaxing()
   }
 
-  async endRelaxing () {
+  private async endRelaxing () {
     return await new Promise((resolve) => {
       setTimeout(() => {
-        if (this.callStack.length > 0) {
-          this.setGoalFloor(this.callStack[0])
+        if (this._callStack.length > 0) {
+          this.setNextGoalFloor()
         } else {
-          this.currentStatus = elevatorStatuses.FREE
-
+          this._currentStatus = elevatorStatuses.FREE
         }
         resolve('')
       }, this.relaxTime)
     })
   }
+
 }

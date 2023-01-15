@@ -2,11 +2,22 @@
   <div v-if="!elevator">Идет загрузка</div>
   <div v-else style="height:calc(100vh - 48px); width: 100%">
     <v-row
+        class="align-center"
         no-gutters
         style="width: 100%; height: 10%; background: #234908"
     >
-      <v-btn @click="restartElevator">restartElevator</v-btn>
-      {{ callStack }}
+      <v-col>
+        Текущий этаж: {{ elevator.currentFloor }}
+      </v-col>
+      <v-col>
+        Скорость: 1 этаж за {{ elevator.moveTimePerFloor / 1000 }} секунд
+      </v-col>
+      <v-col>
+        Время отдыха: 1 этаж за {{ elevator.relaxTime / 1000 }} секунд(ы)
+      </v-col>
+      <v-col>
+        Очередь вызовов: {{elevator.callStack}}
+      </v-col>
     </v-row>
     <v-row
         no-gutters
@@ -50,11 +61,10 @@
 
       </div>
     </v-row>
-
   </div>
 </template>
 
-<script lang="js">
+<script>
 import { Elevator } from '@/entities/elevatorEmulator/elevator'
 
 export default {
@@ -64,7 +74,16 @@ export default {
     elevator: null,
   }),
   computed: {
-    callStack(){
+    moveTimePerFloor () {
+      return this.elevator.moveTimePerFloor
+    },
+    currentFloor () {
+      return this.elevator.currentFloor
+    },
+    lastDifference () {
+      return this.elevator.lastDifference
+    },
+    callStack () {
       if (!this.elevator) return []
       return this.elevator.callStack
     },
@@ -86,38 +105,68 @@ export default {
     },
   },
   methods: {
-    init () {
-      this.setBottomToElevatorNode()
+    async setInitialBottomToElevatorNode () {
+      const elevatorNode = document.getElementById('elevator')
+      if (!elevatorNode) return
+      const elevatorNodeHeight = elevatorNode.offsetHeight
+      elevatorNode.style.transitionDuration = 0 + 'ms'
+      elevatorNode.style.bottom = (this.currentFloor - 1) * elevatorNodeHeight + 'px'
     },
     async setBottomToElevatorNode (value) {
       if (value === null) return
-      const elevatorNode = this.$refs['elevator']
-      console.log('setBottomToElevatorNode', 1, this.elevator.currentFloor, this.elevator.goalFloor)
+      const elevatorNode = document.getElementById('elevator')
       if (!elevatorNode) return
-      console.log('setBottomToElevatorNode', 2, this.elevator.currentFloor, this.elevator.goalFloor)
       const elevatorNodeHeight = elevatorNode.offsetHeight
-      elevatorNode.style.transitionDuration = (this.elevator.lastDifference * this.elevator.moveTimePerFloor) + 'ms'
+      elevatorNode.style.transitionDuration = (this.lastDifference * this.moveTimePerFloor) + 'ms'
       elevatorNode.style.bottom = (value - 1) * elevatorNodeHeight + 'px'
-
-    },
-    restartElevator () {
-      this.elevator = new Elevator({
-        travelTimePerFloor: 1000,
-        floor: 5,
-      })
     },
     addFloorToCallStack (floor) {
       this.elevator.addFloorToCallStack(floor)
     },
-    start () {
-      this.elevator.setGoalFloor(this.goalFloor)
+    setToCache () {
+      const cacheData = {
+        id: this.elevator.id,
+        moveTimePerFloor: this.elevator.moveTimePerFloor,
+        relaxTime: this.elevator.relaxTime,
+        moveDirection: this.elevator.moveDirection,
+        callStack: this.elevator.callStack,
+        currentStatus: this.elevator.currentStatus,
+        currentFloor: this.elevator.currentFloor,
+      }
+      localStorage.setItem('singleElevator', JSON.stringify(cacheData))
+    },
+    getFromCache () {
+      const cacheData = localStorage.getItem('singleElevator')
+      if (!cacheData || typeof cacheData !== 'string') return null
+      return JSON.parse(cacheData)
+    },
+    setCacheInterval () {
+      this.interval = setInterval(this.setToCache, 1000)
+    },
+    clearCacheInterval () {
+      if (!this.interval) return
+      clearInterval(this.interval)
     },
   },
   created () {
-    this.elevator = new Elevator({})
+    const elevatorData = this.getFromCache()
+    if (elevatorData) {
+      this.elevator = new Elevator(elevatorData)
+      this.elevator.initFromCache()
+    } else {
+      this.elevator = new Elevator({})
+    }
   },
   mounted () {
-    this.init()
+    this.setInitialBottomToElevatorNode()
+    this.setBottomToElevatorNode(this.elevator.goalFloor)
+    this.setCacheInterval()
+  },
+  beforeRouteLeave () {
+    this.clearCacheInterval()
+  },
+  beforeRouteUpdate () {
+    this.clearCacheInterval()
   },
 }
 </script>
