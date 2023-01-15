@@ -2,7 +2,7 @@
   <div v-if="!elevator">Идет загрузка</div>
   <div v-else style="height:calc(100vh - 48px); width: 100%">
     <v-row
-        class="align-center"
+        class="align-center px-2"
         no-gutters
         style="width: 100%; height: 10%; background: #234908"
     >
@@ -16,7 +16,7 @@
         Время отдыха: 1 этаж за {{ elevator.relaxTime / 1000 }} секунд(ы)
       </v-col>
       <v-col>
-        Очередь вызовов: {{elevator.callStack}}
+        Очередь вызовов: {{ elevator.callStack }}
       </v-col>
     </v-row>
     <v-row
@@ -29,6 +29,7 @@
             id="elevator"
             ref="elevator"
             :style="`width:100%; height:${100/floorsCount}%; background: #535bf2; position: absolute; bottom: 0`"
+            :class="currentStatus === 'relax' ? 'animated-elevator' : ''"
         >
           <v-chip class="ma-auto">
             <template v-if="elevator.currentStatus === 'moving'">
@@ -79,6 +80,9 @@ export default {
     },
     currentFloor () {
       return this.elevator.currentFloor
+    },
+    currentStatus () {
+      return this.elevator.currentStatus
     },
     lastDifference () {
       return this.elevator.lastDifference
@@ -175,5 +179,22 @@ export default {
 #elevator {
   transition-property: bottom;
   transition-timing-function: linear;
+
+}
+
+.animated-elevator {
+  animation-name: elevator-flashing;
+  animation-duration: 500ms;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes elevator-flashing {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 </style>
