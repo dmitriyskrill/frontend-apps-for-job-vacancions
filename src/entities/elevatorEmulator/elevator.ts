@@ -69,7 +69,14 @@ export class Elevator implements IElevator {
 
   public initFromCache () {
     if (this._callStack.length === 0) return
-    this.setNextGoalFloor()
+    if (this._currentStatus === elevatorStatuses.RELAX) {
+      setTimeout(() => {
+        this._currentStatus = elevatorStatuses.FREE
+        this.setNextGoalFloor()
+      }, this.relaxTime)
+    } else {
+      this.setNextGoalFloor()
+    }
   }
 
   private setNextGoalFloor (floor?: number | null): void {
