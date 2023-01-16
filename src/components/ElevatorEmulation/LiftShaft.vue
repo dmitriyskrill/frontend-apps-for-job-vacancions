@@ -10,7 +10,7 @@
       </div>
       <div
           class="d-flex elevator"
-          id="elevator"
+          :id="`elevator${id}`"
           :style="`height:${100/floorsCount}%;`"
           :class="currentStatus === 'relax' ? 'animated-elevator' : ''"
       >
@@ -34,7 +34,7 @@
 <script>
 export default {
   name: 'ElevatorEmulationLiftShaft',
-  props: ['currentStatus', 'goalFloor', 'floorsCount', 'moveDirection'],
+  props: ['currentStatus', 'goalFloor', 'floorsCount', 'moveDirection', 'id'],
 }
 </script>
 

@@ -15,6 +15,7 @@
 <script>
 export default {
   name: 'ElevatorEmulationFloorButton',
+  events: ['setFloor'],
   props: ['callStack', 'floor', 'height'],
   computed: {
     selected () {

@@ -31,8 +31,10 @@ export default {
     open: ['elevator'],
     elevatorLinks: [
       ['Описание задания', 'mdi-clipboard-text-outline', '/elevator', true],
-      ['Настройки', 'mdi-cog-outline', '/elevator/settings', true],
-      ['Эмуляция', 'mdi-elevator', '/elevator/emulator', true],
+      ['Настройки простого', 'mdi-cog-outline', '/elevator/simplifiedSettings', true],
+      ['Эмуляция простая', 'mdi-elevator', '/elevator/simplifiedEmulator', true],
+      ['Настройки расширенные', 'mdi-cog-outline', '/elevator/extendedSettings', true],
+      ['Эмуляция расширенная', 'mdi-elevator', '/elevator/extendedEmulator', true],
     ],
   }),
 }

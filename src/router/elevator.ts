@@ -10,17 +10,33 @@ const routes = [
     }
   },
   {
-    path: '/elevator/emulator',
-    name: 'elevatorEmulator',
+    path: '/elevator/simplifiedEmulator',
+    name: 'simplifiedElevatorEmulator',
     component: () => import('@/views/elevator/SimplifiedEmulator.vue'),
     meta: {
       layout: Main
     }
   },
   {
-    path: '/elevator/settings',
-    name: 'elevatorSettings',
+    path: '/elevator/simplifiedSettings',
+    name: 'simplifiedElevatorSettings',
     component: () => import('@/views/elevator/SimplifiedEmulatorSettings.vue'),
+    meta: {
+      layout: Main
+    }
+  },
+  {
+    path: '/elevator/extendedSettings',
+    name: 'extendedElevatorSettings',
+    component: () => import('@/views/elevator/ExtendedEmulatorSettings.vue'),
+    meta: {
+      layout: Main
+    }
+  },
+  {
+    path: '/elevator/extendedEmulator',
+    name: 'extendedElevatorEmulator',
+    component: () => import('@/views/elevator/ExtendedEmulator.vue'),
     meta: {
       layout: Main
     }

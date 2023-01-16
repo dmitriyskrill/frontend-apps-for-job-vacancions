@@ -18,6 +18,7 @@ export default {
   name: 'ElevatorEmulationButtonBlock',
   components: { ElevatorEmulationFloorButton },
   props: ['floors', 'floorsCount', 'callStack'],
+  events: ['setFloor'],
 }
 </script>
 
