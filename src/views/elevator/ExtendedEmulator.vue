@@ -1,11 +1,8 @@
 <template>
   <div class="d-flex align-center justify-center" v-if="elevators.length === 0">Идет загрузка</div>
   <v-row no-gutters v-else class="emulator-container">
-    <v-row
-        no-gutters
-        class="main"
-    >
-      <div style="width: 80%; height: 100%">
+    <v-row no-gutters class="main">
+      <div class="elevator-emulation-lift-shaft-controller">
         <v-row no-gutters style="height: 100%">
           <elevator-emulation-lift-shaft-controller
               v-for="elevator in elevators"
@@ -17,27 +14,19 @@
           />
         </v-row>
       </div>
-
       <elevator-emulation-button-block
+          class="button-block"
           :floors="floors"
           :floors-count="floorsCount"
-          :call-stack="callStack"
+          :call-stack="summaryCallStack"
           @setFloor="addFloorToCallStack($event)"
       />
     </v-row>
-    <div style="width: 30%">
-      {{ callStack }}
-      <v-row
-          no-gutters
-          v-for="elevator in elevators"
-          :key="elevator.id"
-      >
-        <div class="pa-2">{{ elevator.currentFloor }}</div>
-        <div class="pa-2">{{ elevator.moveTimePerFloor }}</div>
-        <div class="pa-2">{{ elevator.relaxTime }}</div>
-        <div class="pa-2">{{ elevator.callStack }}</div>
-      </v-row>
-    </div>
+    <elevator-emulation-extended-emulator-info
+        class="extended-emulator-info"
+        :elevators="elevators"
+        :call-stack="callStack"
+    />
   </v-row>
 </template>
 
@@ -49,10 +38,12 @@ import { mapActions, mapState } from 'pinia'
 
 import { useExtendedElevatorEmulatorStore } from '@/stores/extendedElevatorEmulator'
 import ElevatorEmulationLiftShaftController from '@/components/ElevatorEmulation/LiftShaftController.vue'
+import ElevatorEmulationExtendedEmulatorInfo from '@/components/ElevatorEmulation/ExtendedEmulatorInfo.vue'
 
 export default {
   name: 'ElevatorExtendedEmulator',
   components: {
+    ElevatorEmulationExtendedEmulatorInfo,
     ElevatorEmulationLiftShaftController,
     ElevatorEmulationLiftShaft,
     ElevatorEmulationButtonBlock,
@@ -65,8 +56,12 @@ export default {
   }),
   computed: {
     ...mapState(useExtendedElevatorEmulatorStore, ['floorsCount', 'elevatorsCount']),
-    summaryCallStack(){
-      return this.elevators.reduce(()=>{},{})
+    summaryCallStack () {
+      const init = [...this.callStack]
+      return this.elevators.reduce((callStack, elevator) => {
+        callStack.push(...elevator.callStack)
+        return callStack
+      }, init)
     },
     floors () {
       const array = []
@@ -80,7 +75,7 @@ export default {
   methods: {
     ...mapActions(useExtendedElevatorEmulatorStore, ['setFloorsCount']),
     addFloorToCallStack (floor) {
-      if (this.callStack.includes(floor)) return
+      if (this.summaryCallStack.includes(floor)) return
       this.callStack.push(floor)
     },
     addFloorToElevatorCallStack () {
@@ -173,7 +168,6 @@ export default {
       this.elevators.initFromCache()
     } else {
       const elevators = []
-      console.log(this.elevatorsCount)
       for (let i = 1; i <= this.elevatorsCount; i++) {
         elevators.push(new Elevator({ id: i }))
       }
@@ -202,10 +196,24 @@ export default {
   height: calc(100vh - 48px);
   width: 100%;
 
+  > .extended-emulator-info {
+    width: 40%
+  }
+
   > .main {
-    width: 70%;
+    width: 60%;
     height: 100%;
-    background: #b3b7ec
+    background: #b3b7ec;
+
+    > .elevator-emulation-lift-shaft-controller {
+      width: 90%;
+      height: 100%
+    }
+
+    > .button-block {
+      width: 10%;
+      background: #213547;
+    }
   }
 }
 

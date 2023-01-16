@@ -7,11 +7,8 @@
         :move-time-per-floor="moveTimePerFloor"
         :relax-time="relaxTime"
     />
-    <v-row
-        no-gutters
-        class="emulator-container main"
-    >
-      <div style="width: 80%; height: 100%">
+    <v-row no-gutters class="main">
+      <div class="shaft">
         <elevator-emulation-lift-shaft
             :current-status="currentStatus"
             :goal-floor="goalFloor"
@@ -22,6 +19,7 @@
       </div>
 
       <elevator-emulation-button-block
+          class="button-block"
           :floors="floors"
           :floors-count="floorsCount"
           :call-stack="callStack"
@@ -176,7 +174,16 @@ export default {
   & .main {
     width: 100%;
     height: 90%;
-    background: #b3b7ec
+    background: #b3b7ec;
+    > .shaft {
+      width: 90%;
+      height: 100%
+    }
+
+    > .button-block {
+      width: 10%;
+      background: #213547;
+    }
   }
 }
 

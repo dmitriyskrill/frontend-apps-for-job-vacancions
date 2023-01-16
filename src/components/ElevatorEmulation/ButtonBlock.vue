@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 20%; background: #213547; ">
+  <div>
     <elevator-emulation-floor-button
         v-for="floor in floors"
         :key="floor"
@@ -21,7 +21,3 @@ export default {
   events: ['setFloor'],
 }
 </script>
-
-<style scoped>
-
-</style>
