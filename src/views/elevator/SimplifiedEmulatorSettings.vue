@@ -16,6 +16,7 @@ import { mapState, mapActions } from 'pinia'
 import { useSimplifiedElevatorEmulatorStore } from '@/stores/simplifiedElevatorEmulator'
 
 export default {
+  name: 'SimplifiedExtendedEmulatorSettings',
   data: () => ({
     localFloorsCount: null,
   }),
