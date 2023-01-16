@@ -68,6 +68,9 @@
 
 <script>
 import description from '@/assets/testExercise.json'
+import { mapActions } from 'pinia'
+import { useExtendedElevatorEmulatorStore } from '@/stores/extendedElevatorEmulator'
+import { useSimplifiedElevatorEmulatorStore } from '@/stores/simplifiedElevatorEmulator'
 
 export default {
   name: 'ElevatorTaskDescription',
@@ -77,6 +80,13 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useExtendedElevatorEmulatorStore, {
+      extendedSetFloorsCount: 'setFloorsCount',
+      extendedSetElevatorsCount: 'setElevatorsCount'
+    }),
+    ...mapActions(useSimplifiedElevatorEmulatorStore, {
+      simplifiedSetFloorsCount: 'setFloorsCount',
+    }),
     goToSimplifiedSettings () {
       this.$router.push('elevator/simplifiedSettings')
     },
@@ -100,6 +110,11 @@ export default {
       this.$router.push('/elevator/extendedEmulator')
     },
   },
+  created () {
+    this.extendedSetFloorsCount(5)
+    this.extendedSetElevatorsCount(2)
+    this.simplifiedSetFloorsCount(5)
+  }
 }
 
 </script>

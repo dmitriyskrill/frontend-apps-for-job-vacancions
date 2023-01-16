@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 
 export const useExtendedElevatorEmulatorStore = defineStore('extendedElevatorEmulator', {
   state: () => ({
-    floorsCount: 20,
-    elevatorsCount: 4
+    floorsCount: 5,
+    elevatorsCount: 2
   }),
   actions: {
     setFloorsCount (floorsCount: number) {

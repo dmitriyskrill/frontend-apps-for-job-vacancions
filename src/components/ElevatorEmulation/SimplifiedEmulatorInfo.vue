@@ -1,5 +1,5 @@
 <template>
-  <v-row
+  <v-col
       class="align-center px-2 header"
       no-gutters
   >
@@ -15,12 +15,12 @@
     <v-col>
       Очередь вызовов: {{ callStack }}
     </v-col>
-  </v-row>
+  </v-col>
 </template>
 
 <script>
 export default {
-  name: 'ElevatorEmulationSimplifiedEmulatorHeader',
+  name: 'ElevatorEmulationSimplifiedEmulatorInfo',
   props: ['currentFloor', 'moveTimePerFloor', 'relaxTime', 'callStack'],
 }
 </script>
@@ -28,7 +28,7 @@ export default {
 <style scoped>
 .header {
   width: 100%;
-  height: 10%;
+  height: 100%;
   background: #234908
 }
 </style>

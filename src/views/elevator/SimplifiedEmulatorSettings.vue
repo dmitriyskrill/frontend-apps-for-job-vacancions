@@ -6,6 +6,7 @@
         v-model.number="localFloorsCount"
         append-icon="mdi-arrow-right-circle"
         @click:append="setFloorsCount(localFloorsCount)"
+        @keydown.enter="setFloorsCount(localFloorsCount)"
     />
     <v-btn @click="startEmulator">начать</v-btn>
   </div>

@@ -11,6 +11,7 @@
               :width="100/elevatorsCount"
               :floorsCount="floorsCount"
               :floors="floors"
+              :floorHeight="floorHeight"
           />
         </v-row>
       </div>
@@ -20,12 +21,14 @@
           :floors-count="floorsCount"
           :call-stack="summaryCallStack"
           @setFloor="addFloorToCallStack($event)"
+          :floorHeight="floorHeight"
       />
     </v-row>
     <elevator-emulation-extended-emulator-info
         class="extended-emulator-info"
         :elevators="elevators"
         :call-stack="callStack"
+        :floorHeight="floorHeight"
     />
   </v-row>
 </template>
@@ -56,6 +59,10 @@ export default {
   }),
   computed: {
     ...mapState(useExtendedElevatorEmulatorStore, ['floorsCount', 'elevatorsCount']),
+    floorHeight () {
+      const height = this.$vuetify.display.height - 48
+      return Math.floor(height / this.floorsCount)
+    },
     summaryCallStack () {
       const init = [...this.callStack]
       return this.elevators.reduce((callStack, elevator) => {
@@ -73,7 +80,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(useExtendedElevatorEmulatorStore, ['setFloorsCount']),
+    ...mapActions(useExtendedElevatorEmulatorStore, ['setFloorsCount', 'setElevatorsCount']),
     addFloorToCallStack (floor) {
       if (this.summaryCallStack.includes(floor)) return
       this.callStack.push(floor)
@@ -113,17 +120,22 @@ export default {
 
     },
     setToCache () {
-      // const cacheData = {
-      //   id: this.elevator.id,
-      //   moveTimePerFloor: this.elevator.moveTimePerFloor,
-      //   relaxTime: this.elevator.relaxTime,
-      //   moveDirection: this.elevator.moveDirection,
-      //   callStack: this.elevator.callStack,
-      //   currentStatus: this.elevator.currentStatus,
-      //   currentFloor: this.elevator.currentFloor,
-      // }
-      // localStorage.setItem('singleElevator', JSON.stringify(cacheData))
-      // localStorage.setItem('singleElevatorFloorsCount', this.floorsCount)
+      const cacheData = {
+        callStack: this.callStack,
+        elevators: this.elevators.map(elevator => ({
+          id: elevator.id,
+          moveTimePerFloor: elevator.moveTimePerFloor,
+          relaxTime: elevator.relaxTime,
+          moveDirection: elevator.moveDirection,
+          callStack: elevator.callStack,
+          currentStatus: elevator.currentStatus,
+          currentFloor: elevator.currentFloor,
+        })),
+      }
+      localStorage.setItem('multipleElevators', JSON.stringify(cacheData))
+      localStorage.setItem('multipleElevatorsSettings', JSON.stringify({
+        elevatorsCount: this.elevatorsCount, floorsCount: this.floorsCount,
+      }))
     },
     getElevatorsDataFromCache () {
       const cacheData = localStorage.getItem('multipleElevators')
@@ -131,10 +143,12 @@ export default {
       return JSON.parse(cacheData)
     },
     setMultipleSettingsFromCache () {
-      // const cacheData = localStorage.getItem('singleElevatorFloorsCount')
-      // if (cacheData && typeof cacheData === 'string') {
-      //   this.setFloorsCount(Number.parseInt(cacheData))
-      // }
+      const multipleElevatorsSettings = localStorage.getItem('multipleElevatorsSettings')
+      if (multipleElevatorsSettings && typeof multipleElevatorsSettings === 'string') {
+        const settings = JSON.parse(multipleElevatorsSettings)
+        this.setFloorsCount(Number.parseInt(settings.floorsCount))
+        this.setElevatorsCount(Number.parseInt(settings.elevatorsCount))
+      }
     },
     setCallStackInterval () {
       this.callStackInterval = setInterval(this.addFloorToElevatorCallStack, 500)
@@ -162,10 +176,25 @@ export default {
   created () {
     this.setMultipleSettingsFromCache()
     const elevatorsData = this.getElevatorsDataFromCache()
-    if (elevatorsData) {
-
-      this.elevators = new Elevator(elevatorsData)
-      this.elevators.initFromCache()
+    if (elevatorsData
+        && Array.isArray(elevatorsData.elevators)
+        && Array.isArray(elevatorsData.callStack)
+    ) {
+      const elevators = []
+      for (let elevator of elevatorsData.elevators) {
+        elevators.push(new Elevator({
+          id: elevator.id,
+          moveTimePerFloor: elevator.moveTimePerFloor,
+          relaxTime: elevator.relaxTime,
+          moveDirection: elevator.moveDirection,
+          callStack: elevator.callStack,
+          currentStatus: elevator.currentStatus,
+          currentFloor: elevator.currentFloor,
+        }))
+      }
+      this.elevators = elevators
+      this.elevators.forEach(elevator => elevator.initFromCache())
+      this.callStack = elevatorsData.callStack
     } else {
       const elevators = []
       for (let i = 1; i <= this.elevatorsCount; i++) {
@@ -186,7 +215,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .elevator {
   transition-property: bottom;
   transition-timing-function: linear;

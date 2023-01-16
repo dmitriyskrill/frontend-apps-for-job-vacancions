@@ -1,12 +1,7 @@
 <template>
   <div class="d-flex align-center justify-center" v-if="!elevator">Идет загрузка</div>
-  <div v-else class="emulator-container">
-    <elevator-emulation-simplified-emulator-header
-        :call-stack="callStack"
-        :current-floor="currentFloor"
-        :move-time-per-floor="moveTimePerFloor"
-        :relax-time="relaxTime"
-    />
+  <v-row no-gutters v-else class="emulator-container">
+
     <v-row no-gutters class="main">
       <div class="shaft">
         <elevator-emulation-lift-shaft
@@ -15,36 +10,52 @@
             :floors-count="floorsCount"
             :move-direction="moveDirection"
             :id="'Single'"
+            :floorHeight="floorHeight"
         />
       </div>
-
       <elevator-emulation-button-block
           class="button-block"
           :floors="floors"
           :floors-count="floorsCount"
           :call-stack="callStack"
           @setFloor="addFloorToCallStack($event)"
+          :floorHeight="floorHeight"
       />
     </v-row>
-  </div>
+    <elevator-emulation-simplified-emulator-info
+        class="simplified-emulator-info"
+        :call-stack="callStack"
+        :current-floor="currentFloor"
+        :move-time-per-floor="moveTimePerFloor"
+        :relax-time="relaxTime"
+    />
+  </v-row>
 </template>
 
 <script>
 import { Elevator } from '@/entities/elevatorEmulator/elevator'
 import ElevatorEmulationButtonBlock from '@/components/ElevatorEmulation/ButtonBlock.vue'
 import ElevatorEmulationLiftShaft from '@/components/ElevatorEmulation/LiftShaft.vue'
-import ElevatorEmulationSimplifiedEmulatorHeader from '@/components/ElevatorEmulation/SimplifiedEmulatorHeader.vue'
+import ElevatorEmulationSimplifiedEmulatorInfo from '@/components/ElevatorEmulation/SimplifiedEmulatorInfo.vue'
 import { mapActions, mapState } from 'pinia'
 import { useSimplifiedElevatorEmulatorStore } from '@/stores/simplifiedElevatorEmulator'
 
 export default {
   name: 'ElevatorSimplifiedEmulator',
-  components: { ElevatorEmulationSimplifiedEmulatorHeader, ElevatorEmulationLiftShaft, ElevatorEmulationButtonBlock },
+  components: {
+    ElevatorEmulationSimplifiedEmulatorInfo,
+    ElevatorEmulationLiftShaft,
+    ElevatorEmulationButtonBlock
+  },
   data: () => ({
     elevator: null,
   }),
   computed: {
     ...mapState(useSimplifiedElevatorEmulatorStore, ['floorsCount']),
+    floorHeight () {
+      const height = this.$vuetify.display.height - 48
+      return Math.floor(height / this.floorsCount)
+    },
     relaxTime () {
       return this.elevator.relaxTime
     },
@@ -160,20 +171,18 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.elevator {
-  transition-property: bottom;
-  transition-timing-function: linear;
-
-}
-
+<style lang="scss" scoped>
 .emulator-container {
   height: calc(100vh - 48px);
   width: 100%;
 
+  > .simplified-emulator-info {
+    width: 30%
+  }
+
   & .main {
-    width: 100%;
-    height: 90%;
+    width: 70%;
+    height: 100%;
     background: #b3b7ec;
     > .shaft {
       width: 90%;

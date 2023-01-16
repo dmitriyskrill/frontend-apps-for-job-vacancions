@@ -1,7 +1,7 @@
 <template>
   <div
       class="d-flex floor-button"
-      :style="`height: ${height}; `"
+      :style="`height: ${floorHeight}px`"
   >
     <v-btn
         size="x-small"
@@ -17,7 +17,7 @@
 export default {
   name: 'ElevatorEmulationFloorButton',
   events: ['setFloor'],
-  props: ['callStack', 'floor', 'height'],
+  props: ['callStack', 'floor', 'floorHeight'],
   computed: {
     selected () {
       return this.callStack.includes(this.floor)

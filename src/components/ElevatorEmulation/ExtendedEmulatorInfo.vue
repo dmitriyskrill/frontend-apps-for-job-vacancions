@@ -6,7 +6,7 @@
     <v-row no-gutters>
       <v-col cols="2" class="pa-1 ma-auto">id</v-col>
       <v-col cols="2" class="pa-1 ma-auto">Текущий этаж</v-col>
-      <v-col cols="3" class="pa-1 ma-auto">Скорость прохождения этажа</v-col>
+      <v-col cols="3" class="pa-1 ma-auto">Время прохождения этажа,с </v-col>
       <v-col cols="3" class="pa-1 ma-auto">Отдых, с</v-col>
       <v-col cols="2" class="pa-1 ma-auto">Очередь вызовов</v-col>
     </v-row>

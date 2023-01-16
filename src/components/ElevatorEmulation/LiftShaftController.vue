@@ -8,6 +8,7 @@
         :floors-count="floorsCount"
         :move-direction="moveDirection"
         :id="id"
+        :floorHeight="floorHeight"
     />
   </div>
 </template>
@@ -17,7 +18,7 @@ import ElevatorEmulationLiftShaft from '@/components/ElevatorEmulation/LiftShaft
 
 export default {
   name: 'ElevatorEmulationLiftShaftController',
-  props: ['width', 'elevator', 'floorsCount', 'floors'],
+  props: ['width', 'elevator', 'floorsCount', 'floors', 'floorHeight'],
   components: { ElevatorEmulationLiftShaft },
   watch: {
     goalFloor (value) {
@@ -60,17 +61,15 @@ export default {
     async setInitialBottomToElevatorNode () {
       const elevatorNode = document.getElementById(`elevator${this.elevator.id}`)
       if (!elevatorNode) return
-      const elevatorNodeHeight = elevatorNode.offsetHeight
       elevatorNode.style.transitionDuration = 0 + 'ms'
-      elevatorNode.style.bottom = (this.currentFloor - 1) * elevatorNodeHeight + 'px'
+      elevatorNode.style.bottom = (this.currentFloor - 1) * this.floorHeight + 'px'
     },
     async setBottomToElevatorNode (value) {
       if (value === null) return
       const elevatorNode = document.getElementById(`elevator${this.elevator.id}`)
       if (!elevatorNode) return
-      const elevatorNodeHeight = elevatorNode.offsetHeight
       elevatorNode.style.transitionDuration = (this.lastDifference * this.moveTimePerFloor) + 'ms'
-      elevatorNode.style.bottom = (value - 1) * elevatorNodeHeight + 'px'
+      elevatorNode.style.bottom = (value - 1) * this.floorHeight + 'px'
     },
   },
   mounted () {
@@ -79,7 +78,3 @@ export default {
   },
 }
 </script>
-
-<style scoped lang="scss">
-
-</style>

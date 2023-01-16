@@ -1,17 +1,17 @@
 <template>
-  <div class="lift-shaft-container d-flex ">
-    <div class="lift-shaft ma-auto">
+  <div class="lift-shaft-container d-flex align-end">
+    <div class="lift-shaft mx-auto">
       <div
           class="floor"
           v-for="floor in floorsCount"
           :key="floor"
-          :style="`height:${100/floorsCount}%;`"
+          :style="`height:${floorHeight}px`"
       >
       </div>
       <div
           class="d-flex elevator"
           :id="`elevator${id}`"
-          :style="`height:${100/floorsCount}%;`"
+          :style="`height:${floorHeight}px`"
           :class="currentStatus === 'relax' ? 'animated-elevator' : ''"
       >
         <v-chip class="ma-auto" size="x-small">
@@ -34,11 +34,17 @@
 <script>
 export default {
   name: 'ElevatorEmulationLiftShaft',
-  props: ['currentStatus', 'goalFloor', 'floorsCount', 'moveDirection', 'id'],
+  props: ['currentStatus', 'goalFloor', 'floorsCount', 'moveDirection', 'id', 'floorHeight'],
 }
 </script>
 
 <style scoped lang="scss">
+.elevator {
+  transition-property: bottom;
+  transition-timing-function: linear;
+}
+
+
 .lift-shaft-container {
   width: 100%;
   height: 100%;
@@ -49,7 +55,6 @@ export default {
   border-left: 1px solid black;
   border-right: 1px solid black;
   width: 95%;
-  height: 100%;
   position: relative;
 
   > .floor {

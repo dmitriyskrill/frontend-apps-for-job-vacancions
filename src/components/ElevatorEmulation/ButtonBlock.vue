@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div style="display: flex; flex-direction: column; justify-content: end">
     <elevator-emulation-floor-button
         v-for="floor in floors"
         :key="floor"
         :call-stack="callStack"
-        :height="`${100/floorsCount}%`"
         @setFloor="$emit('setFloor', $event)"
         :floor="floor"
+        :floorHeight="floorHeight"
     />
   </div>
 </template>
@@ -17,7 +17,7 @@ import ElevatorEmulationFloorButton from '@/components/ElevatorEmulation/FloorBu
 export default {
   name: 'ElevatorEmulationButtonBlock',
   components: { ElevatorEmulationFloorButton },
-  props: ['floors', 'floorsCount', 'callStack'],
+  props: ['floors', 'floorsCount', 'callStack', 'floorHeight'],
   events: ['setFloor'],
 }
 </script>

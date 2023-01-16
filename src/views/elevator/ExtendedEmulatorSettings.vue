@@ -6,12 +6,14 @@
         v-model.number="localFloorsCount"
         append-icon="mdi-arrow-right-circle"
         @click:append="setFloorsCount(localFloorsCount)"
+        @keydown.enter="setFloorsCount(localFloorsCount)"
     />
     Укажите количество лифтов. Текущее значение: {{ elevatorsCount }}
     <v-text-field
         v-model.number="localElevatorsCount"
         append-icon="mdi-arrow-right-circle"
         @click:append="setElevatorsCount(localElevatorsCount)"
+        @keydown.enter="setElevatorsCount(localElevatorsCount)"
     />
     <v-btn @click="startEmulator">начать</v-btn>
   </div>
