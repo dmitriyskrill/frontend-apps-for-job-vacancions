@@ -11,12 +11,13 @@
         no-gutters
         class="emulator-container main"
     >
-      <div style="width: 80%;height: 100%">
+      <div style="width: 80%; height: 100%">
         <elevator-emulation-lift-shaft
             :current-status="currentStatus"
             :goal-floor="goalFloor"
             :floors-count="floorsCount"
             :move-direction="moveDirection"
+            :id="'Single'"
         />
       </div>
 
@@ -88,7 +89,7 @@ export default {
   methods: {
     ...mapActions(useSimplifiedElevatorEmulatorStore, ['setFloorsCount']),
     async setInitialBottomToElevatorNode () {
-      const elevatorNode = document.getElementById('elevator')
+      const elevatorNode = document.getElementById('elevatorSingle')
       if (!elevatorNode) return
       const elevatorNodeHeight = elevatorNode.offsetHeight
       elevatorNode.style.transitionDuration = 0 + 'ms'
@@ -96,7 +97,7 @@ export default {
     },
     async setBottomToElevatorNode (value) {
       if (value === null) return
-      const elevatorNode = document.getElementById('elevator')
+      const elevatorNode = document.getElementById('elevatorSingle')
       if (!elevatorNode) return
       const elevatorNodeHeight = elevatorNode.offsetHeight
       elevatorNode.style.transitionDuration = (this.lastDifference * this.moveTimePerFloor) + 'ms'
@@ -162,7 +163,7 @@ export default {
 </script>
 
 <style lang="scss">
-#elevator {
+.elevator {
   transition-property: bottom;
   transition-timing-function: linear;
 
