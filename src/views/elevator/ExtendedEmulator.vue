@@ -65,6 +65,9 @@ export default {
   }),
   computed: {
     ...mapState(useExtendedElevatorEmulatorStore, ['floorsCount', 'elevatorsCount']),
+    summaryCallStack(){
+      return this.elevators.reduce(()=>{},{})
+    },
     floors () {
       const array = []
       for (let i = this.floorsCount; i > 0; i--) {

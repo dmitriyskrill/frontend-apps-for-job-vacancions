@@ -4,6 +4,7 @@
       :style="`height: ${height}; `"
   >
     <v-btn
+        size="x-small"
         :color=" selected ? 'success' : ''"
         class="ma-auto"
         @click="$emit('setFloor',floor)"

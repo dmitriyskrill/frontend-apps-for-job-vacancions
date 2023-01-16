@@ -14,7 +14,7 @@
           :style="`height:${100/floorsCount}%;`"
           :class="currentStatus === 'relax' ? 'animated-elevator' : ''"
       >
-        <v-chip class="ma-auto">
+        <v-chip class="ma-auto" size="x-small">
           <template v-if="currentStatus === 'moving'">
             {{ goalFloor }}
             <v-icon size="small">mdi-arrow-{{ moveDirection }}</v-icon>
