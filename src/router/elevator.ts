@@ -20,7 +20,7 @@ const routes = [
   {
     path: '/elevator/settings',
     name: 'elevatorSettings',
-    component: () => import('@/views/elevator/Settings.vue'),
+    component: () => import('@/views/elevator/SimplifiedEmulatorSettings.vue'),
     meta: {
       layout: Main
     }

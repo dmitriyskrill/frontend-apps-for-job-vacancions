@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-center justify-center" v-if="!elevator">Идет загрузка</div>
-  <div v-else style="height:calc(100vh - 48px); width: 100%">
+  <div v-else class="emulator-container">
     <elevator-emulation-simplified-emulator-header
         :call-stack="callStack"
         :current-floor="currentFloor"
@@ -9,7 +9,7 @@
     />
     <v-row
         no-gutters
-        style="width: 100%; height: 90%; background: #b3b7ec"
+        class="emulator-container main"
     >
       <div style="width: 80%;height: 100%">
         <elevator-emulation-lift-shaft
@@ -35,16 +35,18 @@ import { Elevator } from '@/entities/elevatorEmulator/elevator'
 import ElevatorEmulationButtonBlock from '@/components/ElevatorEmulation/ButtonBlock.vue'
 import ElevatorEmulationLiftShaft from '@/components/ElevatorEmulation/LiftShaft.vue'
 import ElevatorEmulationSimplifiedEmulatorHeader from '@/components/ElevatorEmulation/SimplifiedEmulatorHeader.vue'
+import { mapActions, mapState } from 'pinia'
+import { useSimplifiedElevatorEmulatorStore } from '@/stores/simplifiedElevatorEmulator'
 
 export default {
   name: 'ElevatorSimplifiedEmulator',
   components: { ElevatorEmulationSimplifiedEmulatorHeader, ElevatorEmulationLiftShaft, ElevatorEmulationButtonBlock },
   data: () => ({
-    floorsCount: 5,
     elevator: null,
   }),
   computed: {
-    relaxTime(){
+    ...mapState(useSimplifiedElevatorEmulatorStore, ['floorsCount']),
+    relaxTime () {
       return this.elevator.relaxTime
     },
     moveDirection () {
@@ -84,6 +86,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions(useSimplifiedElevatorEmulatorStore, ['setFloorsCount']),
     async setInitialBottomToElevatorNode () {
       const elevatorNode = document.getElementById('elevator')
       if (!elevatorNode) return
@@ -113,11 +116,18 @@ export default {
         currentFloor: this.elevator.currentFloor,
       }
       localStorage.setItem('singleElevator', JSON.stringify(cacheData))
+      localStorage.setItem('singleElevatorFloorsCount', this.floorsCount)
     },
-    getFromCache () {
+    getElevatorDataFromCache () {
       const cacheData = localStorage.getItem('singleElevator')
       if (!cacheData || typeof cacheData !== 'string') return null
       return JSON.parse(cacheData)
+    },
+    setFloorsCountFromCache () {
+      const cacheData = localStorage.getItem('singleElevatorFloorsCount')
+      if (cacheData && typeof cacheData === 'string') {
+        this.setFloorsCount(Number.parseInt(cacheData))
+      }
     },
     setCacheInterval () {
       this.interval = setInterval(this.setToCache, 1000)
@@ -128,7 +138,8 @@ export default {
     },
   },
   created () {
-    const elevatorData = this.getFromCache()
+    this.setFloorsCountFromCache()
+    const elevatorData = this.getElevatorDataFromCache()
     if (elevatorData) {
       this.elevator = new Elevator(elevatorData)
       this.elevator.initFromCache()
@@ -150,11 +161,22 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 #elevator {
   transition-property: bottom;
   transition-timing-function: linear;
 
+}
+
+.emulator-container {
+  height: calc(100vh - 48px);
+  width: 100%;
+
+  & .main {
+    width: 100%;
+    height: 90%;
+    background: #b3b7ec
+  }
 }
 
 .animated-elevator {

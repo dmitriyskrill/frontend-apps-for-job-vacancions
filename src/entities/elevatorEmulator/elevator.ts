@@ -68,7 +68,7 @@ export class Elevator implements IElevator {
   }
 
   public initFromCache () {
-    if (this._callStack.length === 0) return
+
     if (this._currentStatus === elevatorStatuses.RELAX) {
       setTimeout(() => {
         this._currentStatus = elevatorStatuses.FREE
@@ -80,6 +80,7 @@ export class Elevator implements IElevator {
   }
 
   private setNextGoalFloor (floor?: number | null): void {
+    if (this._callStack.length === 0) return
     if (typeof floor === 'number') {
       this._goalFloor = floor
     } else {
