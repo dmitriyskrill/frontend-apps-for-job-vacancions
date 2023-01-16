@@ -26,8 +26,9 @@ export default {
   methods: {
     ...mapActions(useSimplifiedElevatorEmulatorStore, ['setFloorsCount']),
     startEmulator () {
+      localStorage.removeItem('singleElevator')
       localStorage.setItem('singleElevatorFloorsCount', this.floorsCount)
-      this.$router.push('/elevator/emulator')
+      this.$router.push('/elevator/simplifiedEmulator')
     },
   },
 }
