@@ -16,7 +16,7 @@
   </v-main>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import { ref } from 'vue'
 import NavBarLinks from '@/components/NavBarLinks.vue'
 
